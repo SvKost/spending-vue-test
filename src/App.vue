@@ -11,10 +11,7 @@ import IFooter from './components/IFooter.vue'
       <ISidebar />
 
       <main class="flex-1 p-4 relative">
-        <Breadcrumbs />
-        <!-- <div class="relative h-full">
-          <HomeView />
-        </div> -->
+        <!-- <Breadcrumbs /> TODO: -->
         <router-view />
       </main>
     </div>

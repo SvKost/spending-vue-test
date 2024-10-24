@@ -12,10 +12,7 @@ const router = createRouter({
     {
       path: '/graphics',
       name: 'graphics',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/GraphicsView.vue'),
+      component: () => import('../views/ChartView.vue'),
     },
     {
       path: '/tables',
@@ -26,5 +23,3 @@ const router = createRouter({
 })
 
 export default router
-// graphics">Graphics</RouterLink>
-//     <RouterLink to="/tables">Tables

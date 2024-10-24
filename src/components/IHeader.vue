@@ -1,13 +1,11 @@
-<script setup lang="ts">
-import { RouterLink } from 'vue-router'
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <div class="w-full bg-gray-200">
-    <nav class="flex justify-center">
-      <RouterLink to="/">Головна</RouterLink>
-      <RouterLink to="/graphics">Графічне представлення</RouterLink>
-      <RouterLink to="/tables">Табличне представлення</RouterLink>
-    </nav>
+  <div class="flex justify-between p-1 w-full bg-gray-200">
+    <h1>ТОП-10 транзакцій</h1>
+    <div class="flex gap-4">
+      <p>грн / тис грн / млн грн</p>
+      <p>UK</p>
+    </div>
   </div>
 </template>
