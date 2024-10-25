@@ -1,23 +1,16 @@
 <script setup>
 import { useTransactionsStore } from '../stores/useTransactionsStore'
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 
 const store = useTransactionsStore()
 
-const searchTransactions = async () => {
-  store.fetchTopTransactions()
+const handleSearch = async () => {
+  await store.fetchTopTransactions()
 }
 
-const topTenTransactions = computed(() => {
-  return store.rawTransactions
-    .slice()
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 10)
-})
-
-onMounted(() => {
-  store.fetchRegions()
-  store.fetchLastLoads()
+onMounted(async () => {
+  await store.fetchRegions()
+  await store.fetchLastLoads()
 })
 </script>
 
@@ -27,13 +20,13 @@ onMounted(() => {
       Табличне представлення ТОП-10 транзакцій
     </h1>
 
-    <div>
+    <div class="flex items-center gap-2">
+      <p>Оберіть регіон</p>
       <select
         v-if="!store.loading"
         v-model="store.selectedRegion"
         class="border p-2 rounded"
       >
-        <option disabled selected>Оберіть регіон</option>
         <option
           v-for="region in store.regions"
           :key="region.regionCode"
@@ -44,47 +37,76 @@ onMounted(() => {
       </select>
 
       <button
-        @click="searchTransactions"
-        class="ml-2 border rounded p-2"
+        @click="handleSearch"
+        class="border rounded p-2 hover:bg-gray-100"
         :disabled="store.loading"
       >
-        Пошук
+        <span v-if="store.loading">Завантаження...</span>
+        <span v-else>Пошук</span>
       </button>
     </div>
 
-    <div v-if="store.loading">Завантаження...</div>
-    <div v-else-if="store.error" class="text-red-500">
-      Виникла помилка: {{ store.error.message }}
+    <div v-if="store.loading" class="text-center py-4">Завантаження...</div>
+
+    <div
+      v-else-if="store.error"
+      class="bg-red-50 text-red-600 p-4 rounded mb-4"
+    >
+      {{ store.error }}
     </div>
 
-    <!-- <div v-else> -->
-    <div class="mt-4 text-gray-600">
-      Всього знайдено транзакцій: {{ store.rawTransactions.length }}
-    </div>
+    <template v-else>
+      <div class="flex justify-between mb-2">
+        <div class="mt-4 text-gray-600">
+          Всього знайдено транзакцій:
+          {{ store.filteredTransactionsCount }}
+        </div>
 
-    <table class="table-auto w-full border-collapse border border-gray-300">
-      <thead>
-        <tr>
-          <th class="border px-4 py-2">№</th>
-          <th class="border px-4 py-2">ЄДРПОУ платника</th>
-          <th class="border px-4 py-2">Назва платника</th>
-          <th class="border px-4 py-2">Сума</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(transaction, index) in topTenTransactions"
-          :key="transaction.id"
+        <div class="flex justify-center items-center gap-2">
+          <p>Сортувати</p>
+          <select v-model="store.sortOrder" class="border p-2 rounded">
+            <option value="desc">За спаданням</option>
+            <option value="asc">За зростанням</option>
+          </select>
+        </div>
+      </div>
+
+      <div
+        v-if="store.rawTransactions.length === 0"
+        class="text-center py-4 text-gray-500"
+      >
+        Немає даних для відображення
+      </div>
+
+      <div v-else class="overflow-x-auto">
+        <table
+          class="table-auto w-full border-collapse border rounded border-gray-300"
         >
-          <td class="border px-4 py-2">{{ index + 1 }}</td>
-          <td class="border px-4 py-2">{{ transaction.payer_edrpou }}</td>
-          <td class="border px-4 py-2">{{ transaction.payer_name }}</td>
-          <td class="border px-4 py-2">
-            {{ new Intl.NumberFormat('uk-UA').format(transaction.amount) }} ₴
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <!-- </div> -->
+          <thead class="rounded">
+            <tr class="rounded">
+              <th class="border px-4 py-2">№</th>
+              <th class="border px-4 py-2">ЄДРПОУ платника</th>
+              <th class="border px-4 py-2">Назва платника</th>
+              <th class="border px-4 py-2">Сума</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(transaction, index) in store.topTransactions"
+              :key="transaction.id"
+              class="hover:bg-gray-50"
+            >
+              <td class="border px-4 py-2">{{ index + 1 }}</td>
+              <td class="border px-4 py-2">{{ transaction.payer_edrpou }}</td>
+              <td class="border px-4 py-2">{{ transaction.payer_name }}</td>
+              <td class="border px-4 py-2">
+                {{ new Intl.NumberFormat('uk-UA').format(transaction.amount) }}
+                ₴
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
   </div>
 </template>
