@@ -1,5 +1,5 @@
 <script setup>
-import { useTransactionsStore } from '../stores/useTransactionsStore'
+import { useTransactionsStore } from '../stores/useTransactionsTableStore'
 import { onMounted } from 'vue'
 
 const store = useTransactionsStore()
@@ -58,7 +58,7 @@ onMounted(async () => {
     <template v-else>
       <div class="flex justify-between mb-2">
         <div class="mt-4 text-gray-600">
-          Всього знайдено транзакцій:
+          Всього транзакцій по регіону:
           {{ store.filteredTransactionsCount }}
         </div>
 
