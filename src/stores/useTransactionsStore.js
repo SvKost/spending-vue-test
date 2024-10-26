@@ -1,3 +1,4 @@
+import { getRegionsData } from '../services/fetchData'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
@@ -15,6 +16,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
   const isSearched = ref(false)
   const error = ref(null)
   const loading = ref(false)
+  const currencyUnit = ref('грн')
 
   const lastTreasuryLoads = computed(() => {
     const treasuryData = lastloads.value.find(
@@ -35,6 +37,10 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
   const setSelectedRegion = regionCode => {
     selectedRegion.value = regionCode
+  }
+
+  const setActiveRegion = regionCode => {
+    activeRegion.value = regionCode
   }
 
   const calculateTopTransactions = () => {
@@ -69,15 +75,27 @@ export const useTransactionsStore = defineStore('transactions', () => {
   const topTransactions = computed(() => {
     if (!isSearched.value) return []
 
-    if (activeRegion.value === 'ALL') {
-      return topAllTransactions.value.sort((a, b) =>
-        sortOrder.value === 'asc' ? a.amount - b.amount : b.amount - a.amount,
-      )
-    } else {
-      return topRegionTransactions.value.sort((a, b) =>
-        sortOrder.value === 'asc' ? a.amount - b.amount : b.amount - a.amount,
-      )
-    }
+    const unitMultiplier =
+      currencyUnit.value === 'тис'
+        ? 1000
+        : currencyUnit.value === 'млн'
+          ? 1_000_000
+          : 1
+
+    const sortFn = (a, b) =>
+      sortOrder.value === 'asc' ? a.amount - b.amount : b.amount - a.amount
+
+    const transactions =
+      activeRegion.value === 'ALL'
+        ? topAllTransactions.value
+        : topRegionTransactions.value
+
+    return transactions
+      .map(transaction => ({
+        ...transaction,
+        formattedAmount: (transaction.amount / unitMultiplier).toFixed(2),
+      }))
+      .sort(sortFn)
   })
 
   const fetchRegions = async () => {
@@ -86,9 +104,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
       error.value = null
 
       try {
-        const response = await fetch(
-          'https://api.spending.gov.ua/api/v2/dictionaries/regions',
-        )
+        const response = await getRegionsData()
 
         if (!response.ok)
           throw new Error(`Failed to load regions data: ${response.status}`)
@@ -127,47 +143,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     }
   }
 
-  const parseCSV = csvText => {
-    try {
-      const rows = csvText
-        .split('\n')
-        .map(row => row.trim())
-        .filter(row => row.length > 0)
-
-      if (rows.length === 0) {
-        throw new Error('CSV file is empty')
-      }
-
-      const headers = rows[0].split(',').map(header => header.trim())
-
-      if (headers.length === 0) {
-        throw new Error('Headers not found in CSV file')
-      }
-
-      return rows.slice(1).map(row => {
-        const values = row.split(',')
-        return headers.reduce((obj, header, index) => {
-          let value = values[index]?.trim() || ''
-
-          if (value.startsWith('"') && value.endsWith('"')) {
-            value = value.slice(1, -1)
-          }
-
-          obj[header] = value
-          return obj
-        }, {})
-      })
-    } catch (err) {
-      throw new Error(`CSV parsing error: ${err.message}`)
-    }
-  }
-
   const fetchTopTransactions = async () => {
-    if (!lastTreasuryLoads.value) {
-      error.value = new Error('Failed to load last transactions date')
-      return
-    }
-
     const date = lastTreasuryLoads.value
 
     if (cachedTransactions.value[date]) {
@@ -194,15 +170,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
       if (!response.ok)
         throw new Error(`Failed to load transactions: ${response.status}`)
 
-      const contentType = response.headers.get('content-type')
-      let data
-
-      if (contentType?.includes('application/json')) {
-        data = await response.json()
-      } else {
-        const csvText = await response.text()
-        data = parseCSV(csvText)
-      }
+      const data = await response.json()
 
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error('No transactions found for the specified date')
@@ -234,6 +202,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     regions,
     rawTransactions,
     transactions,
+    currencyUnit,
     topTransactions,
     filteredTransactionsCount,
     calculateTopTransactions,
@@ -244,6 +213,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     fetchLastLoads,
     fetchTopTransactions,
     setSelectedRegion,
+    setActiveRegion,
     lastTreasuryLoads,
     isSearched,
     error,

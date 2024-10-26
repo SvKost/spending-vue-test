@@ -1,5 +1,7 @@
 <template>
-  <div class="w-full flex justify-center bg-gray-200 text-white p-2">
-    <p>&copy; 2015–2024</p>
-  </div>
+  <footer class="bg-white border-t border-gray-200">
+    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-500">&copy; 2015–2024</p>
+    </div>
+  </footer>
 </template>

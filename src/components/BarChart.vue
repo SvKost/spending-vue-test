@@ -9,7 +9,7 @@ import {
   CategoryScale,
   LinearScale,
 } from 'chart.js'
-import { useTransactionsStore } from '../stores/useTransactionsTableStore'
+import { useTransactionsStore } from '../stores/useTransactionsStore'
 import { computed } from 'vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
@@ -30,7 +30,7 @@ export default {
         datasets: [
           {
             label: 'Сума транзакції',
-            data: transactions.map(t => t.amount),
+            data: transactions.map(t => t.formattedAmount),
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
             borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 1,
