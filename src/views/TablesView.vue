@@ -11,7 +11,10 @@ onMounted(async () => {
 })
 
 const formatAmount = amount => {
-  return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ' ').replace('.', ',')
+  const formattedNumber = amount
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    .replace('.', ',')
+  return `${formattedNumber} ${store.currencyUnitSuffix}`
 }
 </script>
 

@@ -1,4 +1,4 @@
-import { getRegionsData } from '../services/fetchData'
+import { getLastLoads, getRegionsData } from '../services/fetchData'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
@@ -72,6 +72,17 @@ export const useTransactionsStore = defineStore('transactions', () => {
     }
   }
 
+  const currencyUnitSuffix = computed(() => {
+    switch (currencyUnit.value) {
+      case 'тис':
+        return 'тис грн'
+      case 'млн':
+        return 'млн грн'
+      default:
+        return 'грн'
+    }
+  })
+
   const topTransactions = computed(() => {
     if (!isSearched.value) return []
 
@@ -104,14 +115,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
       error.value = null
 
       try {
-        const response = await getRegionsData()
-
-        if (!response.ok)
-          throw new Error(`Failed to load regions data: ${response.status}`)
-
-        const data = await response.json()
+        const data = await getRegionsData()
         regions.value = [{ regionCode: 'ALL', regionName: 'ВСІ' }, ...data]
-
         localStorage.setItem('regions', JSON.stringify(regions.value))
       } catch (err) {
         error.value = err.message
@@ -127,14 +132,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     error.value = null
 
     try {
-      const response = await fetch(
-        'https://api.spending.gov.ua/api/v2/api/transactions/lastload',
-      )
-
-      if (!response.ok)
-        throw new Error(`Failed to load last date: ${response.status}`)
-
-      lastloads.value = await response.json()
+      lastloads.value = await getLastLoads()
     } catch (err) {
       error.value = err.message
       lastloads.value = []
@@ -203,6 +201,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
     rawTransactions,
     transactions,
     currencyUnit,
+    currencyUnitSuffix,
     topTransactions,
     filteredTransactionsCount,
     calculateTopTransactions,

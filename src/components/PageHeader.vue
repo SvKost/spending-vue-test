@@ -32,7 +32,7 @@ onMounted(async () => {
             id="region-select"
             v-if="!store.loading"
             v-model="store.selectedRegion"
-            class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            class="block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 border-gray-200 sm:text-sm rounded-md"
           >
             <option
               v-for="region in store.regions"
@@ -84,7 +84,7 @@ onMounted(async () => {
         <select
           id="sort-select"
           v-model="store.sortOrder"
-          class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+          class="block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 border-gray-200 sm:text-sm rounded-md"
         >
           <option value="desc">За спаданням</option>
           <option value="asc">За зростанням</option>
@@ -93,7 +93,6 @@ onMounted(async () => {
     </div>
 
     <div class="mt-4">
-      <!-- Loading State -->
       <div
         v-if="store.loading"
         class="bg-blue-50 text-blue-700 p-4 rounded-md flex items-center justify-center"
@@ -140,7 +139,5 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-
-    <!-- </template> -->
   </header>
 </template>

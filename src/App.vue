@@ -2,6 +2,7 @@
 import IHeader from './components/IHeader.vue'
 import ISidebar from './components/ISidebar.vue'
 import IFooter from './components/IFooter.vue'
+import IBreadcrumbs from './components/IBreadcrumbs.vue'
 </script>
 
 <template>
@@ -10,11 +11,10 @@ import IFooter from './components/IFooter.vue'
     <div class="flex flex-1">
       <ISidebar />
       <main class="flex-1 p-6 relative">
+        <IBreadcrumbs />
         <router-view />
       </main>
     </div>
     <IFooter />
   </div>
 </template>
-
-//breadcrums TODO:
