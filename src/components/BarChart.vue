@@ -48,6 +48,9 @@ const chartData = computed(() => {
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  onResize: chart => {
+    chart.resize()
+  },
   plugins: {
     legend: {
       display: true,
