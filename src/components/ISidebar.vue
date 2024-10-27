@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <template>
-  <aside class="w-64 bg-white border-r border-gray-200">
+  <aside class="bg-white border-r border-gray-200">
     <nav class="flex flex-col py-4">
       <RouterLink
         v-for="(link, index) in [

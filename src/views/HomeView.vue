@@ -7,10 +7,22 @@
     >
       ТОП-10 транзакцій за даними Державної казначейської служби України
     </h1>
-    <img
-      class="object-contain w-full max-h-[75vh] mx-auto"
-      alt="Gadgets for calculations"
-      src="../assets/img/main-img.webp"
-    />
+    <picture>
+      <source
+        srcset="../assets/img/main-img.webp"
+        type="image/webp"
+        media="(min-width: 768px)"
+      />
+      <source
+        srcset="../assets/img/main-img.jpg"
+        type="image/jpeg"
+        media="(min-width: 768px)"
+      />
+      <img
+        class="object-contain w-full max-h-[75vh] mx-auto"
+        alt="Gadgets for calculations"
+        src="../assets/img/main-img.jpg"
+      />
+    </picture>
   </div>
 </template>
