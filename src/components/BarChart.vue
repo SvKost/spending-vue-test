@@ -18,10 +18,11 @@ const store = useTransactionsStore()
 const selectedBar = ref(null)
 const currentScreenSize = ref('lg')
 const chartRef = ref(null)
+const containerRef = ref(null)
 
 const updateChart = () => {
   if (chartRef.value?.chart) {
-    chartRef.value.chart.update('none') // Use 'none' to skip animation
+    chartRef.value.chart.update('none')
   }
 }
 
@@ -56,16 +57,28 @@ const debounce = (fn, ms) => {
 
 const debouncedUpdateScreenSize = debounce(updateScreenSize, 250)
 
+const resizeObserver = new ResizeObserver(entries => {
+  for (const entry of entries) {
+    if (entry.target === containerRef.value) {
+      updateChart()
+    }
+  }
+})
+
 onMounted(() => {
   updateScreenSize()
   window.addEventListener('resize', debouncedUpdateScreenSize)
+
+  if (containerRef.value) {
+    resizeObserver.observe(containerRef.value)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', debouncedUpdateScreenSize)
+  resizeObserver.disconnect()
 })
 
-// Watch for screen size changes
 watch(currentScreenSize, () => {
   updateChart()
 })
@@ -100,12 +113,13 @@ const chartData = computed(() => {
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  resizeDelay: 200,
+  resizeDelay: 0,
   plugins: {
     legend: {
       display: currentScreenSize.value !== 'sm',
       position: 'top',
       labels: {
+        boxWidth: currentScreenSize.value === 'sm' ? 10 : 40,
         font: {
           size: currentScreenSize.value === 'sm' ? 12 : 14,
           family: "'Inter', sans-serif",
@@ -189,18 +203,20 @@ const chartOptions = computed(() => ({
     }
   },
   animation: {
-    duration: 750,
+    duration: 500,
     easing: 'easeInOutQuart',
   },
 }))
 </script>
 
 <template>
-  <Bar
-    ref="chartRef"
-    id="my-chart-id"
-    :data="chartData"
-    :options="chartOptions"
-    class="w-full h-full"
-  />
+  <div ref="containerRef" class="w-full h-[400px] sm:h-[500px] md:h-[600px]">
+    <Bar
+      ref="chartRef"
+      id="my-chart-id"
+      :data="chartData"
+      :options="chartOptions"
+      class="w-full h-full"
+    />
+  </div>
 </template>

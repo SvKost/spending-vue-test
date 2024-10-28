@@ -62,7 +62,7 @@ onMounted(async () => {
           />
         </svg>
         <h3 class="mt-2 text-sm font-medium text-gray-900">
-          Тут будуть виведені дані для відображення
+          Тут будуть відображені дані
         </h3>
       </div>
 

@@ -7,10 +7,10 @@ import IBreadcrumbs from './components/IBreadcrumbs.vue'
 
 <template>
   <div class="flex flex-col min-h-screen bg-gray-50">
-    <IHeader />
+    <IHeader @toggle-sidebar="$refs.sidebar.toggleSidebar()" />
     <div class="flex flex-1">
-      <ISidebar />
-      <main class="flex-1 p-6 relative">
+      <ISidebar ref="sidebar" />
+      <main class="flex-1 p-4 relative">
         <IBreadcrumbs />
         <router-view />
       </main>
