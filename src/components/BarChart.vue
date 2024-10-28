@@ -10,20 +10,72 @@ import {
   LinearScale,
 } from 'chart.js'
 import { useTransactionsStore } from '../stores/useTransactionsStore'
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const store = useTransactionsStore()
 const selectedBar = ref(null)
+const currentScreenSize = ref('lg')
+const chartRef = ref(null)
+
+const updateChart = () => {
+  if (chartRef.value?.chart) {
+    chartRef.value.chart.update('none') // Use 'none' to skip animation
+  }
+}
+
+const truncateText = (text, edrpou, screenSize) => {
+  const limits = {
+    sm: 15,
+    md: 20,
+    lg: 30,
+  }
+  const limit = limits[screenSize] || limits.lg
+  const truncatedName =
+    text.slice(0, limit) + (text.length > limit ? '...' : '')
+  return `${truncatedName} (${edrpou || 'Не знайдено'})`
+}
+
+const updateScreenSize = () => {
+  const width = window.innerWidth
+  const newSize = width < 640 ? 'sm' : width < 768 ? 'md' : 'lg'
+  if (newSize !== currentScreenSize.value) {
+    currentScreenSize.value = newSize
+    updateChart()
+  }
+}
+
+const debounce = (fn, ms) => {
+  let timer
+  return (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), ms)
+  }
+}
+
+const debouncedUpdateScreenSize = debounce(updateScreenSize, 250)
+
+onMounted(() => {
+  updateScreenSize()
+  window.addEventListener('resize', debouncedUpdateScreenSize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', debouncedUpdateScreenSize)
+})
+
+// Watch for screen size changes
+watch(currentScreenSize, () => {
+  updateChart()
+})
 
 const chartData = computed(() => {
   const transactions = store.topTransactions.slice(0, 10)
 
   return {
-    labels: transactions.map(
-      t =>
-        `${t.payer_name.slice(0, 30)}${t.payer_name.length > 30 ? '...' : ''} (${t.payer_edrpou || 'Не знайдено'})`,
+    labels: transactions.map(t =>
+      truncateText(t.payer_name, t.payer_edrpou, currentScreenSize.value),
     ),
     datasets: [
       {
@@ -48,33 +100,31 @@ const chartData = computed(() => {
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  onResize: chart => {
-    chart.resize()
-  },
+  resizeDelay: 200,
   plugins: {
     legend: {
-      display: true,
+      display: currentScreenSize.value !== 'sm',
       position: 'top',
       labels: {
         font: {
-          size: 14,
+          size: currentScreenSize.value === 'sm' ? 12 : 14,
           family: "'Inter', sans-serif",
         },
-        padding: 20,
+        padding: currentScreenSize.value === 'sm' ? 10 : 20,
       },
     },
     tooltip: {
       enabled: true,
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       titleFont: {
-        size: 14,
+        size: currentScreenSize.value === 'sm' ? 12 : 14,
         family: "'Inter', sans-serif",
       },
       bodyFont: {
-        size: 13,
+        size: currentScreenSize.value === 'sm' ? 11 : 13,
         family: "'Inter', sans-serif",
       },
-      padding: 12,
+      padding: currentScreenSize.value === 'sm' ? 8 : 12,
       callbacks: {
         label: context => {
           const value = context.raw
@@ -90,13 +140,13 @@ const chartOptions = computed(() => ({
         color: 'rgba(0, 0, 0, 0.1)',
       },
       title: {
-        display: true,
+        display: currentScreenSize.value !== 'sm',
         text: 'млн грн',
         font: {
-          size: 12,
+          size: currentScreenSize.value === 'sm' ? 10 : 12,
           family: "'Inter', sans-serif",
         },
-        padding: 10,
+        padding: currentScreenSize.value === 'sm' ? 5 : 10,
       },
       ticks: {
         callback: value => {
@@ -113,6 +163,9 @@ const chartOptions = computed(() => ({
         stepSize: 0.5,
         min: -1,
         max: 1.5,
+        font: {
+          size: currentScreenSize.value === 'sm' ? 10 : 12,
+        },
       },
     },
     x: {
@@ -120,8 +173,11 @@ const chartOptions = computed(() => ({
         display: false,
       },
       ticks: {
-        maxRotation: 45,
-        minRotation: 45,
+        maxRotation: currentScreenSize.value === 'sm' ? 65 : 45,
+        minRotation: currentScreenSize.value === 'sm' ? 65 : 45,
+        font: {
+          size: currentScreenSize.value === 'sm' ? 10 : 12,
+        },
       },
     },
   },
@@ -140,14 +196,11 @@ const chartOptions = computed(() => ({
 </script>
 
 <template>
-  <div
-    class="bg-white rounded-lg shadow-sm p-4 sm:p-6 md:p-8 h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px]"
-  >
-    <Bar
-      id="my-chart-id"
-      :data="chartData"
-      :options="chartOptions"
-      class="h-full"
-    />
-  </div>
+  <Bar
+    ref="chartRef"
+    id="my-chart-id"
+    :data="chartData"
+    :options="chartOptions"
+    class="w-full h-full"
+  />
 </template>

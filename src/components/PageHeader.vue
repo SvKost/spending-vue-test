@@ -5,6 +5,7 @@ import { onMounted } from 'vue'
 const store = useTransactionsStore()
 
 const handleSearch = async () => {
+  store.setActiveRegion(store.selectedRegion)
   await store.fetchTopTransactions()
 }
 

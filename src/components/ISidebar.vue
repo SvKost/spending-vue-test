@@ -8,8 +8,8 @@ import { RouterLink } from 'vue-router'
       <RouterLink
         v-for="(link, index) in [
           { to: '/', text: 'Головна' },
-          { to: '/graphics', text: 'Графічне представлення' },
           { to: '/tables', text: 'Табличне представлення' },
+          { to: '/graphics', text: 'Графічне представлення' },
         ]"
         :key="index"
         :to="link.to"

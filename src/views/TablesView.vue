@@ -8,6 +8,7 @@ const store = useTransactionsStore()
 onMounted(async () => {
   await store.fetchRegions()
   await store.fetchLastLoads()
+  await store.fetchTopTransactions()
 })
 
 const formatAmount = amount => {
@@ -97,11 +98,8 @@ const formatAmount = amount => {
         />
       </svg>
       <h3 class="mt-2 text-sm font-medium text-gray-900">
-        Немає даних для відображення
+        Тут будуть виведені дані для відображення
       </h3>
-      <p class="mt-1 text-sm text-gray-500">
-        Наразі список транзакцій порожній
-      </p>
     </div>
   </div>
 </template>
