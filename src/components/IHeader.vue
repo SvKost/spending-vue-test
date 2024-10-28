@@ -21,7 +21,9 @@ const handleUnitChange = (event: Event) => {
           <button
             @click="emit('toggleSidebar')"
             class="lg:hidden flex justify-center items-center w-8 h-8 text-gray-500 hover:bg-gray-100 rounded-md"
+            aria-label="Відкрити/закрити меню"
           >
+            <span class="sr-only">Відкрити/закрити меню</span>
             <svg
               class="w-6 h-6"
               fill="none"

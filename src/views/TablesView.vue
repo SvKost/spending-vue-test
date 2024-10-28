@@ -8,7 +8,6 @@ const store = useTransactionsStore()
 onMounted(async () => {
   await store.fetchRegions()
   await store.fetchLastLoads()
-  // await store.fetchTopTransactions()
 })
 const isSmallScreen = () => {
   return window.innerWidth < 640
