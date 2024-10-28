@@ -43,7 +43,8 @@ const links = [
       <button
         @click="closeSidebar"
         class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-600 hover:bg-gray-100 rounded-md"
-      >
+      aria-label="Закрити меню"
+        >
         <svg
           class="w-6 h-6"
           fill="none"

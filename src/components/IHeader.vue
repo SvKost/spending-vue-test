@@ -45,10 +45,12 @@ const handleUnitChange = (event: Event) => {
         <div class="flex items-center space-x-2 sm:space-x-4">
           <button
             class="flex justify-center items-center w-10 h-8 rounded-md border border-gray-200 text-sm"
+            aria-label="Мова"
           >
             UK
           </button>
           <div class="relative">
+            <label for="currency-unit" class="sr-only"> Одиниця валюти </label>
             <select
               id="currency-unit"
               @change="handleUnitChange"
